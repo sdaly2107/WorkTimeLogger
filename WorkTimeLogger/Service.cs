@@ -55,10 +55,15 @@ namespace WorkTimeLogger
             output += $"{Environment.NewLine}Hours to work: {hoursCalculator.HoursToWork.ToString("#.##")} ({hoursCalculator.HoursToWork.ToReadableTime()})";
 
             int week = DateTime.Now.WeekNumber();
-            string outputpath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
-                "WorkTimeLogger", DateTime.Now.Year.ToString(), DateTime.Now.Month.ToString(), "Hours for week " + week + ".txt");
+            string basepath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "WorkTimeLogger");
 
-            File.WriteAllText(outputpath, output);
+            //update file with summary for current week
+            string hoursForCurrentWeekPath = Path.Combine(basepath, "Hours for current week.txt");
+            File.WriteAllText(hoursForCurrentWeekPath, output);
+
+            //write copy of file for history
+            string hoursForWeekSummaryPath = Path.Combine(basepath, DateTime.Now.Year.ToString(), DateTime.Now.Month.ToString(), "Hours for week " + week + ".txt");
+            File.WriteAllText(hoursForWeekSummaryPath, output);
         }
 
         public void SessionChange(SessionChangedArguments e)
