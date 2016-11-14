@@ -20,6 +20,26 @@ namespace WorkTimeLogger
 
         public double HoursToWork { get; set; }
 
+        private DateTime _datetimeNow;
+        public DateTime DateNow
+        {
+            get
+            {
+                if(default(DateTime) != _datetimeNow)
+                {
+                    return _datetimeNow;
+                }
+
+                return DateTime.Now;
+            }
+
+            set
+            {
+                _datetimeNow = value;
+            }
+
+        }
+
 
         public HoursCalclulator(Settings settings)
         {
@@ -69,7 +89,9 @@ namespace WorkTimeLogger
                 else
                 {
                     DateTime startTime = startEvents.Min();
-                    DateTime endTime = endEvents.Max();
+
+                    //last lock event, or now if no lock
+                    DateTime endTime = endEvents.Any() ? endEvents.Max() : this.DateNow;
 
                     currentDayHours.StartTime = startTime;
                     currentDayHours.EndTime = endTime;

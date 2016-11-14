@@ -40,7 +40,7 @@ namespace WorkTimeLoggerTests
         {
             var eventstart = new WorkEvent
             {
-                Time = new DateTime(2016, 1, 1, 8, 0,0),
+                Time = new DateTime(2016, 1, 1, 8, 0, 0),
                 Type = SessionSwitchReason.SessionUnlock
             };
 
@@ -174,7 +174,36 @@ namespace WorkTimeLoggerTests
             result.First().HoursWorked.Should().Be(11.5);
         }
 
-        //holidays!!
+        [TestMethod]
+        public void TestProcessWeek_CalculatesHoursWhenNoLockEvent()
+        {
+            //freeze now time to 10am
+            var frozenTime = new DateTime(2016, 1, 1, 10, 0, 0);
+            _subject.DateNow = frozenTime;
+
+            //9am
+            var eventstart = new WorkEvent
+            {
+                Time = new DateTime(2016, 1, 1, 9, 0, 0),
+                Type = SessionSwitchReason.SessionUnlock
+            };
+
+            //day started but not ended yet
+            var data = new List<WorkDay>()
+            {
+                new WorkDay
+                {
+                    Date = DateTime.Now,
+                    Events = new List<WorkEvent> { eventstart }
+                }
+            };
+
+            _mockDataProvider.Setup(x => x.GetWeekEvents(It.IsAny<DateTime>())).Returns(data);
+
+            IList<Hours> result = _subject.ProcessWeek(DateTime.Now);
+
+            result.First().HoursWorked.Should().Be(1);
+        }
 
     }
 }
