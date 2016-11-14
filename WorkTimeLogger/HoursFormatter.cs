@@ -2,26 +2,12 @@
 using System.Collections.Generic;
 using System.Text;
 using WorkTimeLogger.Models;
+using WorkTimeLogger.Extensions;
 
 namespace WorkTimeLogger
 {
     public class HoursFormatter
     {
-        private string ToReadableTime(double hours)
-        {
-            StringBuilder sb = new StringBuilder();
-            TimeSpan hoursTS = TimeSpan.FromHours(hours);
-
-            if ((int)hoursTS.TotalHours > 0)
-            {
-                sb.Append((int)hoursTS.TotalHours).Append(" hours and ");
-            }
-
-            sb.Append(hoursTS.Minutes).Append(" minutes");
-
-            return sb.ToString();
-        }
-
         public string Format(IList<Hours> hours)
         {
             StringBuilder sb = new StringBuilder();
@@ -44,7 +30,7 @@ namespace WorkTimeLogger
                 sb.Append(Environment.NewLine);
 
                 sb.Append("Hours worked: ").Append(day.HoursWorked.ToString("#.##"));
-                sb.Append(" (").Append(ToReadableTime(day.HoursWorked)).Append(")");
+                sb.Append(" (").Append(day.HoursWorked.ToReadableTime()).Append(")");
                 sb.Append(Environment.NewLine);
                 sb.Append(Environment.NewLine);
             }

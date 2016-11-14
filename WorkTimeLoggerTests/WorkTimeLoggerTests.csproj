@@ -70,6 +70,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="DoubleExtensionsTests.cs" />
     <Compile Include="HoursCalculatorTests.cs" />
     <Compile Include="SessionLoggerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

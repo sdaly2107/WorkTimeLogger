@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extensions\DateTimeExtensions.cs" />
+    <Compile Include="Extensions\DoubleExtensions.cs" />
     <Compile Include="HoursCalclulator.cs" />
     <Compile Include="HoursFormatter.cs" />
     <Compile Include="Interfaces\ICalculator.cs" />
