@@ -51,7 +51,7 @@ namespace WorkTimeLogger
             var formatter = new HoursFormatter();
             string output = formatter.Format(data);
 
-            output += $"{Environment.NewLine}{Environment.NewLine}Hours worked in week: {hoursCalculator.HoursWorked.ToString("#.##")} ({hoursCalculator.HoursToWork.ToReadableTime()})";
+            output += $"{Environment.NewLine}{Environment.NewLine}Hours worked in week: {hoursCalculator.HoursWorked.ToString("#.##")} ({hoursCalculator.HoursWorked.ToReadableTime()})";
             output += $"{Environment.NewLine}Hours to work: {hoursCalculator.HoursToWork.ToString("#.##")} ({hoursCalculator.HoursToWork.ToReadableTime()})";
 
             int week = DateTime.Now.WeekNumber();
