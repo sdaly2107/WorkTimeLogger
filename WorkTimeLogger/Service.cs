@@ -7,6 +7,7 @@ using WorkTimeLogger.Extensions;
 using WorkTimeLogger.Interfaces;
 using System.Threading;
 using System.Globalization;
+using WorkTimeLogger.Extensions;
 
 namespace WorkTimeLogger
 {
@@ -50,8 +51,8 @@ namespace WorkTimeLogger
             var formatter = new HoursFormatter();
             string output = formatter.Format(data);
 
-            output += $"{Environment.NewLine}{Environment.NewLine}Hours worked in week: {hoursCalculator.HoursWorked.ToString("#.##")}";
-            output += $"{Environment.NewLine}Hours to work: {hoursCalculator.HoursToWork.ToString("#.##")}";
+            output += $"{Environment.NewLine}{Environment.NewLine}Hours worked in week: {hoursCalculator.HoursWorked.ToString("#.##")} ({hoursCalculator.HoursToWork.ToReadableTime()})";
+            output += $"{Environment.NewLine}Hours to work: {hoursCalculator.HoursToWork.ToString("#.##")} ({hoursCalculator.HoursToWork.ToReadableTime()})";
 
             int week = DateTime.Now.WeekNumber();
             string outputpath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
