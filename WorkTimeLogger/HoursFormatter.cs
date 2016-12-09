@@ -11,6 +11,7 @@ namespace WorkTimeLogger
         public string Format(IList<Hours> hours)
         {
             StringBuilder sb = new StringBuilder();
+            sb.Append(Environment.NewLine);
 
             foreach (Hours day in hours)
             {

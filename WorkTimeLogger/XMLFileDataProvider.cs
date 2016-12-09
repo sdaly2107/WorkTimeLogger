@@ -79,12 +79,17 @@ namespace WorkTimeLogger
             return weekDirectoryPath;
         }
 
+        private string BuildDayFilePathName(DateTime time)
+        {
+            return $"{string.Format("{0:dd-MM}", time)}.xml";
+        }
+
         public void UpdateEvents(DateTime time, WorkEvent newevent)
         {
             string weekDirectoryPath = BuildWeekDirectoryPath(time);
             string todaysDataPath = Path.Combine(
-                                                    weekDirectoryPath,
-                                                    $"{string.Format("{0:dd-MM}", DateTime.Now)}.xml"
+                                                   weekDirectoryPath,
+                                                   BuildDayFilePathName(DateTime.Now)
                                                 );
 
             var workday = File.Exists(todaysDataPath) ? DeserialiseEventData(File.ReadAllText(todaysDataPath))
@@ -103,63 +108,37 @@ namespace WorkTimeLogger
         public IEnumerable<WorkDay> GetWeekEvents(DateTime time)
         {
             List<WorkDay> workdays = new List<WorkDay>();
-            string weekDirectoryPath = BuildWeekDirectoryPath(time);
 
-            foreach (string workdayPath in Directory.GetFiles(weekDirectoryPath, "*.xml"))
+            const int workingDaysCount = 5;
+            var day = time.FirstDateOfWeek();
+
+            for (int x = 0; x < workingDaysCount; ++x)
             {
-                string workdayXML = File.ReadAllText(workdayPath);
-                WorkDay workday = DeserialiseEventData(workdayXML);
+                string weekDirPath = BuildWeekDirectoryPath(time); //build for each day because the week can span two months
+                string dayDataPath = Path.Combine(weekDirPath, BuildDayFilePathName(day));
 
-                //don't care about weekends
-                if (workday.Date.DayOfWeek == DayOfWeek.Saturday || workday.Date.DayOfWeek == DayOfWeek.Sunday)
+                if (File.Exists(dayDataPath))
                 {
-                    continue;
+                    string workdayXML = File.ReadAllText(dayDataPath);
+                    WorkDay workday = DeserialiseEventData(workdayXML);
+
+                    workdays.Add(workday);
+                }
+                else
+                {
+                    _logger.Debug($"Data missing for {day.ToString()}");
+                    workdays.Add(new WorkDay
+                    {
+                        Date = day
+                    });
                 }
 
-                workdays.Add(workday);
+                day = day.AddDays(1); //roll to next day
             }
 
-            workdays = workdays.OrderBy(x => x.Date).ToList();
-
-            int workingDaysCount = 5;
-
-            if (workdays.Count == workingDaysCount)
-            {
-                _logger.Debug($"{workingDaysCount} days of data found");
-                return workdays;
-            }
-            else
-            {
-                List<WorkDay> workdaysTemp = new List<WorkDay>();
-                DateTime dateToStamp = time.FirstDateOfWeek();
-
-                for (int x = 0; x < workingDaysCount; ++x)
-                {
-                    var workDay = workdays.SingleOrDefault(d => d.Date.Day == dateToStamp.Day);
-
-                    //data missing for day so add 
-                    if (workDay == null)
-                    {
-                        _logger.Debug($"Data missing for {dateToStamp.ToString()}");
-                        workdaysTemp.Add(new WorkDay
-                        {
-                            Date = dateToStamp
-                        });
-                    }
-                    else
-                    {
-                        workdaysTemp.Add(workDay);
-                    }
-
-                    dateToStamp = dateToStamp.AddDays(1);
-                }
-
-                return workdaysTemp;
-            }
+            return workdays;
         }
-
     }
-
 
 }
 
