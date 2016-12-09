@@ -7,7 +7,7 @@ using WorkTimeLogger.Extensions;
 using WorkTimeLogger.Interfaces;
 using System.Threading;
 using System.Globalization;
-using WorkTimeLogger.Extensions;
+using System.Threading.Tasks;
 
 namespace WorkTimeLogger
 {
@@ -90,11 +90,25 @@ namespace WorkTimeLogger
             }
         }
 
+        private void ScheduleMidnightProcessing()
+        {
+            //if user is on holiday for the week and their pc is left on then this will allow the week data summary (stating hol/out of office) to be written still 
+            DateTime now = DateTime.Now;
+            DateTime tomorrow = now.AddDays(1).Date;
+
+            Task.Delay(tomorrow - now).ContinueWith(_ =>
+            {
+                ProcessTimeData();
+                ScheduleMidnightProcessing(); //reschedule again for the following day
+            });
+        }
+
         public void Start()
         {
             _logger.Info("Service starting");
             SetDefaultCulture();
             ProcessTimeData();
+            ScheduleMidnightProcessing();
         }
 
         public void Stop()
