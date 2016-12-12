@@ -44,17 +44,22 @@ namespace WorkTimeLogger
             _logger.Info("Culture updated");
         }
 
-        private void ProcessTimeData()
+        private void ProcessTimeDataForWeek()
+        {
+            ProcessTimeData(DateTime.Now);
+        }
+
+        private void ProcessTimeData(DateTime time)
         {
             ICalculator hoursCalculator = new HoursCalclulator(new Settings());
-            var data = hoursCalculator.ProcessWeek(DateTime.Now);
+            var data = hoursCalculator.ProcessWeek(time);
             var formatter = new HoursFormatter();
             string output = formatter.Format(data);
 
             output += $"{Environment.NewLine}{Environment.NewLine}Hours worked in week: {hoursCalculator.HoursWorked.ToString("#.##")} ({hoursCalculator.HoursWorked.ToReadableTime()})";
             output += $"{Environment.NewLine}Hours to work: {hoursCalculator.HoursToWork.ToString("#.##")} ({hoursCalculator.HoursToWork.ToReadableTime()})";
 
-            int week = DateTime.Now.WeekNumber();
+            int week = time.WeekNumber();
             string basepath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "WorkTimeLogger");
 
             //update file with summary for current week
@@ -62,7 +67,7 @@ namespace WorkTimeLogger
             File.WriteAllText(hoursForCurrentWeekPath, output);
 
             //write copy of file for history
-            string hoursForWeekSummaryPath = Path.Combine(basepath, DateTime.Now.Year.ToString(), DateTime.Now.Month.ToString(), "Hours for week " + week + ".txt");
+            string hoursForWeekSummaryPath = Path.Combine(basepath, time.Year.ToString(), time.Month.ToString(), "Hours for week " + week + ".txt");
             File.WriteAllText(hoursForWeekSummaryPath, output);
         }
 
@@ -82,7 +87,7 @@ namespace WorkTimeLogger
 
             try
             {
-                ProcessTimeData();
+                ProcessTimeDataForWeek();
             }
             catch (Exception ex)
             {
@@ -94,11 +99,11 @@ namespace WorkTimeLogger
         {
             //if user is on holiday for the week and their pc is left on then this will allow the week data summary (stating hol/out of office) to be written still 
             DateTime now = DateTime.Now;
-            DateTime tomorrow = now.AddDays(1).Date;
+            DateTime tomorrow = now.AddDays(1).Date.AddMinutes(5); //five past midnight
 
             Task.Delay(tomorrow - now).ContinueWith(_ =>
             {
-                ProcessTimeData();
+                ProcessTimeDataForWeek();
                 ScheduleMidnightProcessing(); //reschedule again for the following day
             });
         }
@@ -107,7 +112,12 @@ namespace WorkTimeLogger
         {
             _logger.Info("Service starting");
             SetDefaultCulture();
-            ProcessTimeData();
+
+            //process last weeks data incase user was holiday and their machine was off
+            DateTime lastweek = DateTime.Now.AddDays(-7);
+            ProcessTimeData(lastweek);
+
+            ProcessTimeDataForWeek();
             ScheduleMidnightProcessing();
         }
 
