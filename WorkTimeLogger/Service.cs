@@ -56,8 +56,12 @@ namespace WorkTimeLogger
             var formatter = new HoursFormatter();
             string output = formatter.Format(data);
 
+            string hoursToWorkLabel = hoursCalculator.HoursToWork == 0 ? "No hours to work"
+                                                                       : hoursCalculator.HoursToWork > 0 ? "Hours to work" : "Hours cumulated";
+
+
             output += $"{Environment.NewLine}{Environment.NewLine}Hours worked in week: {hoursCalculator.HoursWorked.ToString("#.##")} ({hoursCalculator.HoursWorked.ToReadableTime()})";
-            output += $"{Environment.NewLine}Hours to work: {hoursCalculator.HoursToWork.ToString("#.##")} ({hoursCalculator.HoursToWork.ToReadableTime()})";
+            output += $"{Environment.NewLine}{hoursToWorkLabel}: {hoursCalculator.HoursToWork.ToString("#.##")} ({hoursCalculator.HoursToWork.ToReadableTime()})";
 
             int week = time.WeekNumber();
             string basepath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "WorkTimeLogger");
