@@ -8,7 +8,7 @@ namespace WorkTimeLogger
 {
     public class HoursFormatter
     {
-        public string Format(IList<Hours> hours)
+        public string Format(IList<Hours> hours, Settings settings)
         {
             StringBuilder sb = new StringBuilder();
             sb.Append(Environment.NewLine);
@@ -32,6 +32,12 @@ namespace WorkTimeLogger
 
                 sb.Append("Hours worked: ").Append(day.HoursWorked.ToString("#.##"));
                 sb.Append(" (").Append(day.HoursWorked.ToReadableTime()).Append(")");
+
+                if(day.HoursWorked < settings.MinDailyHours)
+                {
+                    sb.Append(" [MIN HOURS NOT MET]");
+                }
+
                 sb.Append(Environment.NewLine);
                 sb.Append(Environment.NewLine);
             }

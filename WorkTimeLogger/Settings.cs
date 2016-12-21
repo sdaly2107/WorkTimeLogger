@@ -20,6 +20,8 @@
 
         public double NoShowHours { get; set; }
 
+        public double MinDailyHours { get; set; }
+
         public double MinWeekHours { get; set; }
 
         public HourRange BandwidthHours { get; set; }
@@ -31,6 +33,7 @@
             HoursBeforeLunchDeducted = 5;
             Lunch = 0.5;
             NoShowHours = 7.4;
+            MinDailyHours = 5;
             MinWeekHours = 37; //this could be less over the month
             BandwidthHours = new HourRange(7, 19);
         }

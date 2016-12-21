@@ -51,10 +51,11 @@ namespace WorkTimeLogger
 
         private void ProcessTimeData(DateTime time)
         {
-            ICalculator hoursCalculator = new HoursCalclulator(new Settings());
+            var settings = new Settings();
+            ICalculator hoursCalculator = new HoursCalclulator(settings);
             var data = hoursCalculator.ProcessWeek(time);
             var formatter = new HoursFormatter();
-            string output = formatter.Format(data);
+            string output = formatter.Format(data, settings);
 
             string hoursToWorkLabel = hoursCalculator.HoursToWork == 0 ? "No hours to work"
                                                                        : hoursCalculator.HoursToWork > 0 ? "Hours to work" : "Hours cumulated";

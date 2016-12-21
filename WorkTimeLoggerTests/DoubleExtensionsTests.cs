@@ -17,7 +17,7 @@ namespace WorkTimeLoggerTests
         {
             double hours = 1;
 
-            hours.ToReadableTime().Should().Be("1 hour");
+            hours.ToReadableTime().Should().Be("1 hour and 0 minutes");
 
         }
 
@@ -34,7 +34,7 @@ namespace WorkTimeLoggerTests
         {
             double hours = 0.4;
 
-            hours.ToReadableTime().Should().Be("24 minutes");
+            hours.ToReadableTime().Should().Be("0 hours and 24 minutes");
         }
 
     }
