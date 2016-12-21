@@ -11,23 +11,12 @@ namespace WorkTimeLogger.Extensions
             TimeSpan hoursTS = TimeSpan.FromHours(hours);
 
             int totalhours = (int)hoursTS.TotalHours;
+            string hourPostfix = totalhours == 1 ? " hour" : " hours";
+            string minsPostfix = hoursTS.Minutes == 1 ? " minute" : " minutes";
 
-            if(totalhours == 1)
-            {
-                sb.Append(totalhours).Append(" hour");
-
-            }else if (totalhours > 0)
-            {
-                sb.Append(totalhours).Append(" hours");
-            }
-
-            if(hoursTS.Minutes > 0)
-            {
-                if(totalhours > 0) sb.Append(" and ");
-
-                sb.Append(hoursTS.Minutes).Append(" minutes");
-            }
-            
+            sb.Append(totalhours).Append(hourPostfix);
+            sb.Append(" and ");
+            sb.Append(hoursTS.Minutes).Append(minsPostfix);
 
             return sb.ToString();
         }
