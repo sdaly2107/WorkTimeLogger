@@ -119,10 +119,18 @@ namespace WorkTimeLogger
 
                 if (File.Exists(dayDataPath))
                 {
-                    string workdayXML = File.ReadAllText(dayDataPath);
-                    WorkDay workday = DeserialiseEventData(workdayXML);
+                    try
+                    {
+                        string workdayXML = File.ReadAllText(dayDataPath);
+                        WorkDay workday = DeserialiseEventData(workdayXML);
 
-                    workdays.Add(workday);
+                        workdays.Add(workday);
+                    }
+                    catch(InvalidOperationException)
+                    {
+                        _logger.Warn($"Failed to read event data from {dayDataPath}, could be corrupted.");
+                        workdays.Add(new WorkDay{Date = day});
+                    }
                 }
                 else
                 {
