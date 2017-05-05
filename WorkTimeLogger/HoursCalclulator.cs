@@ -20,6 +20,10 @@ namespace WorkTimeLogger
 
         public double HoursToWork { get; set; }
 
+        public DateTime FridayStartTime { get; set; }
+
+        public double HoursToWorkExcludingFriday { get; set; }
+
         private DateTime _datetimeNow;
         public DateTime DateNow
         {
@@ -101,10 +105,23 @@ namespace WorkTimeLogger
                     currentDayHours.HoursWorked = workSpan.TotalHours;
 
                     DockLunch(currentDayHours);
+
+
+                    if(workday.Date.DayOfWeek == DayOfWeek.Friday)
+                    {
+                        //used for calculating earliest finish time on a friday
+                        FridayStartTime = startTime;
+                    }
+                   
                 }
 
                 hours.Add(currentDayHours);
                 UpdateHoursWorkedForWeek(currentDayHours);
+
+                if (workday.Date.DayOfWeek != DayOfWeek.Friday)
+                {
+                    HoursToWorkExcludingFriday += currentDayHours.HoursWorked;
+                }
             }
 
             return hours;

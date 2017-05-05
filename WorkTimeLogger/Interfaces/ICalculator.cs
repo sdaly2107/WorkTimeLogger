@@ -13,6 +13,10 @@ namespace WorkTimeLogger.Interfaces
 
         double HoursToWork { get; set; }
 
+        DateTime FridayStartTime { get; set; }
+
+        double HoursToWorkExcludingFriday { get; set; }
+
         IList<Hours> ProcessWeek(DateTime time);
 
     }

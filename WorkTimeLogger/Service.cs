@@ -57,12 +57,44 @@ namespace WorkTimeLogger
             var formatter = new HoursFormatter();
             string output = formatter.Format(data, settings);
 
-            string hoursToWorkLabel = hoursCalculator.HoursToWork == 0 ? "No hours to work"
-                                                                       : hoursCalculator.HoursToWork > 0 ? "Hours to work" : "Hours cumulated";
+            double hoursToWork = hoursCalculator.HoursToWork;
+
+            string hoursToWorkLabel = hoursToWork == 0 ? "No hours to work"
+                                                                       : hoursToWork > 0 ? "Hours to work" : "Hours cumulated";
 
 
             output += $"{Environment.NewLine}{Environment.NewLine}Hours worked in week: {hoursCalculator.HoursWorked.ToString("#.##")} ({hoursCalculator.HoursWorked.ToReadableTime()})";
-            output += $"{Environment.NewLine}{hoursToWorkLabel}: {hoursCalculator.HoursToWork.ToString("#.##")} ({hoursCalculator.HoursToWork.ToReadableTime()})";
+            output += $"{Environment.NewLine}{hoursToWorkLabel}: {hoursToWork.ToString("#.##")} ({hoursToWork.ToReadableTime()})";
+
+            if(DateTime.Now.DayOfWeek == DayOfWeek.Friday && hoursCalculator.FridayStartTime != default(DateTime))
+            {
+                double fridayHoursToWork = settings.MinWeekHours - hoursCalculator.HoursToWorkExcludingFriday;
+                bool requiresLunch = fridayHoursToWork > settings.HoursBeforeLunchDeducted;
+
+                double remainingHoursToWork = requiresLunch ? fridayHoursToWork + settings.Lunch : fridayHoursToWork;
+
+                var fridayStartTime = hoursCalculator.FridayStartTime;
+
+                //trim hours if user started before allowed hours
+                if(fridayStartTime.Hour < settings.BandwidthHours.from)
+                {
+                    fridayStartTime = new DateTime(fridayStartTime.Year, fridayStartTime.Month, fridayStartTime.Day, settings.BandwidthHours.from, 0, 0);
+                }
+
+                var fridayFinishTime = hoursCalculator.FridayStartTime.AddHours(remainingHoursToWork);
+
+                //user must work up to end of core hours
+                if(fridayFinishTime.Hour < settings.CoreHours.to)
+                {
+                    fridayFinishTime = new DateTime(fridayStartTime.Year, fridayStartTime.Month, fridayStartTime.Day, settings.CoreHours.to, 0, 0);
+                }
+
+                output += $"{Environment.NewLine}{Environment.NewLine}It's Friday and you can finish at {fridayFinishTime}";
+                if(requiresLunch)
+                {
+                    output += $" with included lunch.";
+                }
+            }
 
             int week = time.WeekNumber();
             string basepath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "WorkTimeLogger");
