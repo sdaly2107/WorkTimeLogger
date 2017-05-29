@@ -74,10 +74,10 @@ namespace WorkTimeLogger
                 };
 
                 var startEvents = workday.Events.Where(x => x.Type == SessionSwitchReason.SessionLogon || x.Type == SessionSwitchReason.SessionUnlock)
-                                                     .Select(x => x.Time);
+                                                     .Select(x => x.Time).ToList();
 
                 var endEvents = workday.Events.Where(x => x.Type == SessionSwitchReason.SessionLogoff || x.Type == SessionSwitchReason.SessionLock)
-                                                    .Select(x => x.Time);
+                                                    .Select(x => x.Time).ToList();
 
 
                 currentDayHours.HoursWorked = _settings.NoShowHours;
@@ -90,10 +90,15 @@ namespace WorkTimeLogger
                         continue;
                     }
                 }
+                else if(!startEvents.Any() && endEvents.Any())
+                {
+                    _logger.Debug($"There are end events, but no start events, ignoring...");
+                    continue;
+                }
                 else
                 {
                     DateTime startTime = startEvents.Min();
-
+                  
                     //last lock event, or now if no lock
                     DateTime endTime = endEvents.Any() ? endEvents.Max() : this.DateNow;
 
